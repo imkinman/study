@@ -55,7 +55,7 @@ module.exports = { presets, plugins }
 &emsp;&emsp; 它包含的插件支持所有最新的JS语法特性，如果不进行配置，会默认加载所有插件<br>
 &emsp;④ @babel/preset-env 参数<br>
 &emsp;&emsp;targets: { Object }，目标浏览器的指定版本号，如果设置了该属性，那么 env 的 preset 只会对目标浏览器中没有的功能加载转换插件<br>
-&emsp;&emsp;useBuiltIns: { String }，如果设置为"usage"，那么 @babel/polyfill 只会对目标浏览器中没有的功能加载所需要的 polyfill<br>
+&emsp;&emsp;useBuiltIns: { String }，"usage | entry | false"，如果设置为"usage"，那么 @babel/polyfill 只会对目标浏览器中没有的功能加载所需要的 polyfill<br>
 
 5、polyfill<br>
 &emsp;① 什么是<br>
@@ -70,17 +70,69 @@ module.exports = { presets, plugins }
 &emsp;② env "useBuiltIns"参数<br>
 &emsp;&emsp;如果将 @babel/preset-env 的"useBuiltIns"设置为"usage"，Babel会检查所有的代码，为目标环境中缺少的功能，添加需要的polyfill，而不用手动引入完整的 polyfill<br>
 
+6、配置<br>
+&emsp;① .babelrc<br>
+&emsp;&emsp;适用场景：静态配置<br>
+```
+{
+	"presets": ["@babel/preset-env"],
+	"plugins": ["@babel/plugin-transform-arrow-functions"]
+}
+```
+&emsp;② package.json<br>
+&emsp;&emsp;适用场景：静态配置，只是将 .babelrc 的配置，写进 package.json 文件中
+```
+{
+	"name": "my-project",
+	"version": "1.0.0",
+	"babel": {
+		"presets": [...],
+		"plugins": [...]
+	}
+}
+```
+&emsp;③ babel.config.js(官方推荐)<br>
+&emsp;④ .babelrc.js<br>
+&emsp;&emsp;适用场景：上述两种，以编程的方式创建配置，可以基于环境动态配置
+```
+写法一：
+module.exports = api => {
+	api.cache(true)	// 必须加上这句话，否则报错
+	const presets = [
+		"preset-1",
+		["preset-2"],
+		[
+			"@babel/preset-env",
+			{
+				targets: { ie: "6", chrome: "64" },
+				useBuiltIns: "usage"
+			}
+		]
+	]
+	const plugins = [
+		"plugin-1",
+		["plugin-2"],
+		["@babel/plugin-transform-arrow-functions", { }]
+	]
+	return {
+		presets,
+		plugins
+	}
+}
+写法二：
+const presets = [...]
+const plugins = [...]
+module.exports = { presets, plugins }
+```
 
+7、官方插件<br>
 
-
-
-
-
-
-
-
-
-
+版本|插件名|作用|链接
+-|-|-|-
+ES3|@babel/plugin-transform-member-expression-literals|为对象属性赋值时，对象属性为JS关键字，则将 .属性名 转为 ["属性名"]|<a href="https://www.babeljs.cn/docs/babel-plugin-transform-member-expression-literals" target="_blank">查看</a>
+&emsp;|babel-plugin-transform-property-literals|将对象中属性名的引号移除|<a href="https://www.babeljs.cn/docs/babel-plugin-transform-property-literals" target="_blank">查看</a>
+&emsp;|@babel/plugin-transform-reserved-words|声明变量时，变量名为保留字时，会在前面加上下划线|<a href="https://www.babeljs.cn/docs/babel-plugin-transform-reserved-words" target="_blank">查看</a>
+ES5|@babel/plugin-transform-property-mutators|转换 setter/getter 语法格式|<a href="https://www.babeljs.cn/docs/babel-plugin-transform-property-mutators" target="_blank">查看</a>
 
 
 
